@@ -22,7 +22,7 @@ from kmodes.kmodes import KModes
 
 #variables
 num_clusters = 3
-url="https://raw.githubusercontent.com/mahakbansal/Cognitive-Classification-and-Reasoning/master/feb-2019-survey-final-3.csv"
+url="https://raw.githubusercontent.com/mahakbansal/Cognitive-Classification-and-Reasoning/master/Feb25_students.csv"
 
 
 # In[3]:
@@ -200,23 +200,29 @@ def ss_attribute(a, b, **_):
     return np.array(cost)
 
 
-# In[23]:
+# In[30]:
 
 
 run_elbow = 0
 
 if(run_elbow):
-    xx=[]
-    yy=[]
+    
     num_init=20
-    for i in range(1,11):
-        km = KModes(n_clusters=i, init='Huang', n_init=num_init, verbose=0, cat_dissim=ss)
-        clusters = km.fit_predict(df_dummy)
-        print("Clusters: ",i," n_init: ",num_init," Best cost: ",km.cost_)
-        xx.append(i)
-        yy.append(km.cost_)
-    plt.plot(xx,yy,'go-',label='Cluster vs Cost')
-    plt.show()
+    km = []
+    clusters = []
+    num_attribute_clusters = 3
+    for i in range(0,len(weights)):
+        xx=[]
+        yy=[]
+        for j in range(1,8):            
+            attribute_index = i
+            kmtemp = KModes(n_clusters=j, init='Huang', n_init=10, verbose=0, cat_dissim=ss_attribute)
+            clusterstemp = kmtemp.fit_predict(df_dummy)
+            print("Attribute: ",i," Clusters: ",j," n_init: ",10," Best cost: ",kmtemp.cost_)
+            xx.append(j)
+            yy.append(kmtemp.cost_)
+        plt.plot(xx,yy,'go-',label='Cluster vs Cost')
+        plt.show()
 else:
     km = []
     clusters = []
@@ -231,13 +237,13 @@ else:
         df_dummy[cluster_name] = clusters[i]
 
 
-# In[24]:
+# In[31]:
 
 
 df_dummy.head()
 
 
-# In[25]:
+# In[32]:
 
 
 # #dissimilaty matrix calculation
@@ -255,7 +261,7 @@ df_dummy.head()
 
 # #### Algorithm for finding the appropriate number of clusters
 
-# In[26]:
+# In[33]:
 
 
 # run_elbow = 0
@@ -279,41 +285,7 @@ df_dummy.head()
 #     df_dummy['clusters'] = clusters
 
 
-# In[29]:
-
-
-for i in range(0,9):
-    display_emails(i)
-
-
-# In[ ]:
-
-
-# # Principal Component Analysis for dimentionality reduction
-# pca = PCA(2)
-
-# # Turn the dummified df into two columns with PCA
-# plot_columns = pca.fit_transform(df_dummy.iloc[:,:-1])
-
-# # Plot based on the two dimensions, and shade by cluster label
-# plt.scatter(x=plot_columns[:,1], y=plot_columns[:,0], c=df_dummy["clusters"])
-# plt.show()
-
-
-# In[ ]:
-
-
-# # Heatmap for feature weightage visualisation
-
-# categorical_cols.insert(0,'Binned GPA')
-# plt.matshow(pca.components_,cmap='viridis')
-# plt.yticks([0,1],['1st Comp','2nd Comp'],fontsize=10)
-# plt.colorbar()
-# plt.xticks(range(len(categorical_cols)),categorical_cols,rotation=65,ha='left')
-# plt.show()
-
-
-# In[28]:
+# In[34]:
 
 
 # # Display results of kmodes
@@ -330,6 +302,61 @@ def display_emails(i):
     for i in range(0,num_clusters):
         print("Cluster ",i," :",arr[i])
         print()
+
+
+# In[35]:
+
+
+def display_plots(i):
+    # # Principal Component Analysis for dimentionality reduction
+    pca = PCA(2)
+    cluster_name = 'cluster'+str(i)
+    # Turn the dummified df into two columns with PCA
+    plot_columns = pca.fit_transform(df_dummy.iloc[:,:-9])
+
+    # Plot based on the two dimensions, and shade by cluster label
+    plt.scatter(x=plot_columns[:,1], y=plot_columns[:,0], c=df_dummy[cluster_name])
+    plt.title(cluster_name)
+    plt.show()
+
+
+# In[36]:
+
+
+for i in range(0,9):
+    display_emails(i)   
+
+
+# In[ ]:
+
+
+for i in range(0,9):
+    display_plots(i)
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+# # Heatmap for feature weightage visualisation
+
+# categorical_cols.insert(0,'Binned GPA')
+# plt.matshow(pca.components_,cmap='viridis')
+# plt.yticks([0,1],['1st Comp','2nd Comp'],fontsize=10)
+# plt.colorbar()
+# plt.xticks(range(len(categorical_cols)),categorical_cols,rotation=65,ha='left')
+# plt.show()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
